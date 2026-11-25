@@ -1,0 +1,15 @@
+identity:
+  name: list_templates
+  author: shotstack
+  label:
+    en_US: List Templates
+description:
+  human:
+    en_US: Lists the templates saved in your Shotstack account, newest first.
+  llm: >-
+    Lists the templates saved in the user's Shotstack account (ID, name, last updated), newest first. Use it to find
+    the template ID that Render Template needs.
+parameters: []
+extra:
+  python:
+    source: tools/list_templates.py

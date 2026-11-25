@@ -1,0 +1,30 @@
+identity:
+  author: shotstack
+  name: shotstack
+  label:
+    en_US: Shotstack
+  description:
+    en_US: Render video, image and audio from JSON or templates with the Shotstack API.
+  icon: icon.png
+  tags:
+    - videos
+    - image
+credentials_for_provider:
+  api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: API Key
+    placeholder:
+      en_US: Your Shotstack API key
+    help:
+      en_US: Your Production API key from the Shotstack dashboard. Renders use credits from your Shotstack account.
+    url: https://shotstack.io/docs/guide/getting-started/request-api-keys/
+tools:
+  - tools/render_from_json.yaml
+  - tools/render_template.yaml
+  - tools/get_render_status.yaml
+  - tools/list_templates.yaml
+extra:
+  python:
+    source: provider/shotstack.py

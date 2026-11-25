@@ -1,0 +1,55 @@
+identity:
+  name: render_template
+  author: shotstack
+  label:
+    en_US: Render Template
+description:
+  human:
+    en_US: Renders a template saved in your Shotstack account, filling in its placeholders.
+  llm: >-
+    Renders a template saved in the user's Shotstack account and returns the status and the file URL. Fill the
+    template's placeholders with merge fields. Call List Templates first to find a template ID.
+parameters:
+  - name: template_id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Template ID
+    human_description:
+      en_US: The ID of a template in your Shotstack account. List Templates returns them.
+    llm_description: The template ID, a UUID from List Templates.
+  - name: merge_fields
+    type: string
+    required: false
+    form: llm
+    label:
+      en_US: Merge fields (JSON)
+    human_description:
+      en_US: 'Placeholder names and their values as a JSON object, for example {"TITLE": "Summer sale"}. Leave empty to use the template as saved.'
+    llm_description: >-
+      A JSON object mapping placeholder names (without braces) to values, for example {"TITLE":"Summer sale"}.
+      Omit it to use the template's own values.
+  - name: wait
+    type: boolean
+    required: false
+    default: true
+    form: form
+    label:
+      en_US: Wait for the render to finish
+    human_description:
+      en_US: On returns the file URL. Off returns the render ID straight away, and Get Render Status checks it later.
+  - name: timeout_seconds
+    type: number
+    required: false
+    default: 120
+    min: 5
+    max: 300
+    form: form
+    label:
+      en_US: Give up after (seconds)
+    human_description:
+      en_US: Only used when waiting. Giving up does not stop the render.
+extra:
+  python:
+    source: tools/render_template.py

@@ -1,0 +1,46 @@
+identity:
+  name: render_from_json
+  author: shotstack
+  label:
+    en_US: Render From JSON
+description:
+  human:
+    en_US: Renders a video, image or audio file from a Shotstack edit and returns its URL.
+  llm: >-
+    Renders a video, image or audio file from a Shotstack edit (JSON with a timeline and an output) and returns the
+    status and the file URL. Use this to make a video from scratch.
+parameters:
+  - name: edit
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Edit (JSON)
+    human_description:
+      en_US: A Shotstack edit, a timeline of tracks and clips plus output settings. Paste one from the Shotstack docs or Studio, or map JSON from an earlier step.
+    llm_description: >-
+      A Shotstack edit as a JSON object with a "timeline" and an "output". Minimal example:
+      {"timeline":{"tracks":[{"clips":[{"asset":{"type":"title","text":"Hello","style":"minimal"},"start":0,"length":3}]}]},"output":{"format":"mp4","resolution":"sd"}}
+  - name: wait
+    type: boolean
+    required: false
+    default: true
+    form: form
+    label:
+      en_US: Wait for the render to finish
+    human_description:
+      en_US: On returns the file URL. Off returns the render ID straight away, and Get Render Status checks it later.
+  - name: timeout_seconds
+    type: number
+    required: false
+    default: 120
+    min: 5
+    max: 300
+    form: form
+    label:
+      en_US: Give up after (seconds)
+    human_description:
+      en_US: Only used when waiting. Giving up does not stop the render.
+extra:
+  python:
+    source: tools/render_from_json.py

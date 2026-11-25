@@ -1,0 +1,44 @@
+identity:
+  name: get_render_status
+  author: shotstack
+  label:
+    en_US: Get Render Status
+description:
+  human:
+    en_US: Checks a render and returns its status and, once done, its file URL.
+  llm: >-
+    Checks a render by ID and returns its status (queued, fetching, rendering, saving, done or failed) and, once it
+    is done, the file URL.
+parameters:
+  - name: render_id
+    type: string
+    required: true
+    form: llm
+    label:
+      en_US: Render ID
+    human_description:
+      en_US: The ID that Render From JSON or Render Template returned.
+    llm_description: The render ID returned by a render tool.
+  - name: wait
+    type: boolean
+    required: false
+    default: false
+    form: form
+    label:
+      en_US: Wait for the render to finish
+    human_description:
+      en_US: On keeps checking until the render is done or failed. Off checks once.
+  - name: timeout_seconds
+    type: number
+    required: false
+    default: 120
+    min: 5
+    max: 300
+    form: form
+    label:
+      en_US: Give up after (seconds)
+    human_description:
+      en_US: Only used when waiting. Giving up does not stop the render.
+extra:
+  python:
+    source: tools/get_render_status.py
