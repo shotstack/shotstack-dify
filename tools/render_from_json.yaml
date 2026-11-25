@@ -41,6 +41,30 @@ parameters:
       en_US: Give up after (seconds)
     human_description:
       en_US: Only used when waiting. Giving up does not stop the render.
+output_schema:
+  type: object
+  properties:
+    id:
+      type: string
+      description: The render ID.
+    status:
+      type: string
+      description: queued, fetching, rendering, saving, done or failed.
+    url:
+      type: string
+      description: The finished file's URL, once status is done.
+    poster:
+      type: string
+      description: The poster image URL, if one was requested.
+    thumbnail:
+      type: string
+      description: The thumbnail URL, if one was requested.
+    duration:
+      type: number
+      description: Length of the file in seconds.
+    error:
+      type: string
+      description: Shotstack's error message when the render failed.
 extra:
   python:
     source: tools/render_from_json.py

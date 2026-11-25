@@ -211,6 +211,8 @@ class PackageTests(unittest.TestCase):
             for p in tool["parameters"]:
                 self.assertIn(p["form"], ("llm", "form"))
                 self.assertTrue(p["human_description"]["en_US"])
+            if "render" in rel:  # without output_schema Dify's workflow editor can't pick url, id or status
+                self.assertLessEqual({"id", "status", "url"}, set(tool["output_schema"]["properties"]), rel)
 
 
 if __name__ == "__main__":
