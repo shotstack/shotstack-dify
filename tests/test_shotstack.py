@@ -99,6 +99,14 @@ class ApiTests(unittest.TestCase):
             with self.assertRaisesRegex(api.ShotstackError, "abc is still rendering after 5 s"):
                 api.wait_for_render(CREDS, "abc", 5, sleep=lambda s: None, now=lambda: next(ticks))
 
+    def test_wait_rides_out_brief_api_errors(self):
+        replies = iter([FakeResponse(503, {"message": "Service Unavailable"}), status("done")])
+        with patch("shotstack_api.requests.request", side_effect=lambda *a, **k: next(replies)):
+            self.assertEqual(api.wait_for_render(CREDS, "abc", 60, sleep=lambda s: None, now=lambda: 0)["url"], URL)
+        with patch("shotstack_api.requests.request", return_value=FakeResponse(403, {"errors": [{"detail": "Invalid key"}]})):
+            with self.assertRaisesRegex(api.ShotstackError, "Invalid key"):  # a real error still stops at once
+                api.wait_for_render(CREDS, "abc", 60, sleep=lambda s: None, now=lambda: 0)
+
     def test_error_shapes(self):
         cases = [
             (400, {"success": False, "message": "Bad Request", "response": {"message": "Validation failed", "errors": [

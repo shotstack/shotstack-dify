@@ -21,6 +21,10 @@ workflow, chatflow or agent.
 Both render tools can wait for the file (on by default, up to 300 seconds) or return the render ID straight away.
 Each tool returns JSON, a text summary for agents, and one variable per field (`id`, `status`, `url`) for workflows.
 
+Renders with AI assets can take several minutes. For those, turn **Wait** off on the render step and add
+**Get Render Status** after it with **Wait** on and Dify's **Retry on failure** enabled. Don't turn on retries for a
+render step: each retry starts, and bills, a new render.
+
 ## Example
 
 A workflow with a Start node, a **Render From JSON** node and an End node that outputs `url`. Paste this into **Edit**:
@@ -39,6 +43,8 @@ The plugin makes HTTPS requests to `api.shotstack.io` and nothing else. It needs
 ## Notes
 
 - Your key is only sent to `api.shotstack.io`. See [PRIVACY.md](PRIVACY.md).
-- Generating AI images, video and audio is not in this version.
+- AI images, video, voice and music work inside an edit: give an asset a `prompt` and a `model`, and Shotstack
+  generates it during the render. A separate generate tool is not in this version.
 - Source and issues: https://github.com/shotstack/shotstack-dify
-- Contributing and releases: [CONTRIBUTING.md](CONTRIBUTING.md). Changes: [CHANGELOG.md](CHANGELOG.md).
+- Contributing and releases: [CONTRIBUTING.md](https://github.com/shotstack/shotstack-dify/blob/main/CONTRIBUTING.md).
+  Changes: [CHANGELOG.md](https://github.com/shotstack/shotstack-dify/blob/main/CHANGELOG.md).

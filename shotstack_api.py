@@ -9,12 +9,14 @@ VERSION = "0.0.1"
 ORIGIN = "dify"  # counted per platform in Shotstack's usage data
 BASE = "https://api.shotstack.io/edit/v1"  # Production only: one key, no environment switch
 POLL_SECONDS = 3
-DEFAULT_TIMEOUT = 120
+DEFAULT_TIMEOUT = 300  # AI assets in an edit can take minutes
 MAX_TIMEOUT = 300
 
 
 class ShotstackError(Exception):
-    pass
+    def __init__(self, message, transient=False):
+        super().__init__(message)
+        self.transient = transient  # network error, 429 or 5xx: asking again may work
 
 
 def error_text(body, raw=""):
@@ -63,13 +65,14 @@ def call(credentials, method, path, body=None):
             },
         )
     except requests.RequestException as e:
-        raise ShotstackError(f"Could not reach Shotstack: {e}") from e
+        raise ShotstackError(f"Could not reach Shotstack: {e}", transient=True) from e
     try:
         data = r.json()
     except ValueError:
         data = None
     if r.status_code >= 400 or (isinstance(data, dict) and data.get("success") is False):
-        raise ShotstackError(f"Shotstack {r.status_code}: {error_text(data, r.text)}")
+        raise ShotstackError(f"Shotstack {r.status_code}: {error_text(data, r.text)}",
+                             transient=r.status_code == 429 or r.status_code >= 500)
     return data.get("response", data) if isinstance(data, dict) else {}
 
 
@@ -134,7 +137,13 @@ def get_render(credentials, render_id):
 def wait_for_render(credentials, render_id, timeout, sleep=time.sleep, now=time.monotonic):
     deadline = now() + timeout
     while True:
-        r = get_render(credentials, render_id)
+        try:
+            r = get_render(credentials, render_id)
+        except ShotstackError as e:  # checking is safe to repeat: ride out a blip, the render keeps going
+            if not e.transient or now() + POLL_SECONDS > deadline:
+                raise
+            sleep(POLL_SECONDS)
+            continue
         status = r.get("status")
         if status == "done":
             return r
@@ -142,8 +151,8 @@ def wait_for_render(credentials, render_id, timeout, sleep=time.sleep, now=time.
             raise ShotstackError(f"Render {render_id} failed: {r.get('error') or 'no reason given'}")
         if now() + POLL_SECONDS > deadline:
             raise ShotstackError(
-                f"Render {render_id} is still {status} after {timeout} s. "
-                "Call Get Render Status with this ID to check again."
+                f"Render {render_id} is still {status} after {timeout} s and keeps going. "
+                "Check it with Get Render Status. Retrying a render step starts, and bills, a new render."
             )
         sleep(POLL_SECONDS)
 

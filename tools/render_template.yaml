@@ -42,7 +42,7 @@ parameters:
   - name: timeout_seconds
     type: number
     required: false
-    default: 120
+    default: 300
     min: 5
     max: 300
     form: form
