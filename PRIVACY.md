@@ -4,6 +4,8 @@ This plugin sends the data you give it to the Shotstack API at `api.shotstack.io
 
 - Your Shotstack API key, as the `x-api-key` header.
 - The edit JSON, the template ID and the merge fields you pass to a tool, and render IDs you look up.
+- An `x-shotstack-origin: dify` header and a `shotstack-dify/<version>` User-Agent, which tell Shotstack the request
+  came from this plugin.
 
 The plugin itself collects no personal data. Anything personal you put in an edit or merge field (names, text, links
 to images or video) is sent to Shotstack to render, and Shotstack hosts the rendered files at the URL it returns.

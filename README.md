@@ -19,7 +19,8 @@ workflow, chatflow or agent.
 | **List Templates** | Lists your templates (ID, name, last updated), newest first. |
 
 Both render tools can wait for the file (on by default, up to 300 seconds) or return the render ID straight away.
-Each tool returns JSON, a text summary for agents, and one variable per field (`id`, `status`, `url`) for workflows.
+Each tool returns JSON and a text summary for agents. The render and status tools also return one variable per field
+(`id`, `status`, `url`) for workflows.
 
 Renders with AI assets can take several minutes. For those, turn **Wait** off on the render step and add
 **Get Render Status** after it with **Wait** on and Dify's **Retry on failure** enabled. Don't turn on retries for a

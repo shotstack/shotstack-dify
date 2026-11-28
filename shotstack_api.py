@@ -6,7 +6,7 @@ from urllib.parse import quote
 import requests
 
 VERSION = "0.0.1"
-ORIGIN = "dify"  # counted per platform in Shotstack's usage data
+ORIGIN = "dify"  # tells Shotstack which integration sent the request
 BASE = "https://api.shotstack.io/edit/v1"  # Production only: one key, no environment switch
 POLL_SECONDS = 3
 DEFAULT_TIMEOUT = 300  # AI assets in an edit can take minutes
@@ -56,7 +56,8 @@ def call(credentials, method, path, body=None):
             method,
             BASE + path,
             json=body,
-            timeout=30,
+            timeout=(5, 25),  # connect, read: keeps a full wait under main.py's 360 s request limit
+            allow_redirects=False,  # never forward the key to another host
             headers={
                 "x-api-key": key,  # only ever sent to api.shotstack.io
                 "x-shotstack-origin": ORIGIN,
@@ -70,7 +71,7 @@ def call(credentials, method, path, body=None):
         data = r.json()
     except ValueError:
         data = None
-    if r.status_code >= 400 or (isinstance(data, dict) and data.get("success") is False):
+    if r.status_code >= 300 or (isinstance(data, dict) and data.get("success") is False):
         raise ShotstackError(f"Shotstack {r.status_code}: {error_text(data, r.text)}",
                              transient=r.status_code == 429 or r.status_code >= 500)
     return data.get("response", data) if isinstance(data, dict) else {}
@@ -83,7 +84,7 @@ def parse_json(value, label, kind):
     except ValueError as e:
         raise ShotstackError(f"{label} is not valid JSON: {e}") from e
     if not isinstance(parsed, kind):
-        raise ShotstackError(f"{label} must be a JSON {'object' if kind is dict else 'array'}.")
+        raise ShotstackError(f"{label} must be a JSON {({dict: 'object', list: 'array'}).get(kind, 'object or array')}.")
     return parsed
 
 

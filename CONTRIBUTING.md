@@ -29,9 +29,10 @@
 
 ## Release a new version
 
-1. Raise `version` and `meta.version` in `manifest.yaml` together, and add an entry to `CHANGELOG.md`. Merge that by PR.
+1. Raise `version` in `manifest.yaml` and `VERSION` in `shotstack_api.py` together (leave `meta.version`: it is the
+   manifest format version), and add an entry to `CHANGELOG.md`. Merge that by PR.
 2. From the folder above this one: `dify plugin package ./shotstack-dify`.
 3. Validate the `.difypkg` with `validator/validate-difypkg.py` from
    [dify-marketplace-toolkit](https://github.com/langgenius/dify-marketplace-toolkit).
-4. Open a PR to [langgenius/dify-plugins](https://github.com/langgenius/dify-plugins) that adds only the new package to
-   `shotstack/shotstack/`, as a "Version update". One package per PR.
+4. Open a PR to [langgenius/dify-plugins](https://github.com/langgenius/dify-plugins) as a "Version update": add the new
+   package to `shotstack/shotstack/` and remove the old one (Dify keeps only the current version). One package per PR.

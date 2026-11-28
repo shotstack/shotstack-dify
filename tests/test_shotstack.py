@@ -55,6 +55,10 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(kwargs["headers"]["x-api-key"], "test-key")
         self.assertEqual(kwargs["headers"]["x-shotstack-origin"], "dify")
         self.assertTrue(kwargs["headers"]["User-Agent"].startswith("shotstack-dify/"))
+        self.assertIs(kwargs["allow_redirects"], False)
+        with patch("shotstack_api.requests.request", return_value=FakeResponse(302, None)):
+            with self.assertRaisesRegex(api.ShotstackError, "302"):
+                api.render_from_json(CREDS, EDIT)
 
     def test_edit_accepts_an_object_and_rejects_bad_input(self):
         with patch("shotstack_api.requests.request", return_value=queued()) as req:
@@ -72,6 +76,8 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(api.merge_list(None), [])
         with self.assertRaisesRegex(api.ShotstackError, "find"):
             api.merge_list('[{"x": 1}]')
+        with self.assertRaisesRegex(api.ShotstackError, "object or array"):
+            api.merge_list("5")
 
     def test_render_template_body(self):
         with patch("shotstack_api.requests.request", return_value=queued()) as req:
@@ -212,6 +218,10 @@ class PackageTests(unittest.TestCase):
         provider = yaml.safe_load((root / manifest["plugins"]["tools"][0]).read_text(encoding="utf-8"))
         self.assertTrue((root / "_assets" / manifest["icon"]).exists())
         self.assertTrue((root / manifest["privacy"]).exists())
+        allowed = {"agent", "business", "design", "education", "entertainment", "finance", "image", "news", "other",
+                   "productivity", "rag", "search", "social", "travel", "utilities", "videos", "weather", "llm",
+                   "model_provider", "audio", "document", "devtools", "database", "security", "translation"}
+        self.assertTrue(1 <= len(manifest["tags"]) <= 3 and set(manifest["tags"]) <= allowed)  # Marketplace blocks otherwise
         self.assertTrue((root / provider["extra"]["python"]["source"]).exists())
         for rel in provider["tools"]:
             tool = yaml.safe_load((root / rel).read_text(encoding="utf-8"))

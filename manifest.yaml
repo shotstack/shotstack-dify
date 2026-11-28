@@ -9,6 +9,9 @@ label:
 description:
   en_US: Render video, image and audio from JSON or templates with the Shotstack API.
 icon: icon.png
+tags:
+  - videos
+  - image
 resource:
   memory: 268435456
 plugins:
